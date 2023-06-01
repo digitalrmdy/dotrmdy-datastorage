@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Description>
+			Provides a simple abstraction for interacting with a database.
+			If you're the end-consumer of this package, make sure you also have a package installed that provides implementations of said abstractions or
+			provide your own.
+		</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="JetBrains.Annotations" Version="2022.3.1" PrivateAssets="All"/>
+	</ItemGroup>
+
+</Project>

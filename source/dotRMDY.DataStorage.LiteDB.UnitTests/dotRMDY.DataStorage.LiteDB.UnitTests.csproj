@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<IsPackable>false</IsPackable>
+		<IsTestProject>true</IsTestProject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="dotRMDY.TestingTools" Version="1.1.0" />
+		<PackageReference Include="FakeItEasy" Version="7.4.0" />
+		<PackageReference Include="FluentAssertions" Version="6.11.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\dotRMDY.DataStorage.LiteDB\dotRMDY.DataStorage.LiteDB.csproj" />
+	</ItemGroup>
+
+</Project>
+

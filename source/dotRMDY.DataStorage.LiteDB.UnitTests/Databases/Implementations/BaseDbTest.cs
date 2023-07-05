@@ -1,5 +1,4 @@
 using System.IO;
-using System.Threading.Tasks;
 using dotRMDY.DataStorage.LiteDB.Databases.Implementations;
 using dotRMDY.DataStorage.LiteDB.Services;
 using dotRMDY.TestingTools;

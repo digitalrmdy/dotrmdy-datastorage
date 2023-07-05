@@ -8,7 +8,6 @@ using dotRMDY.DataStorage.Abstractions.Repositories;
 using dotRMDY.DataStorage.LiteDB.Databases;
 using dotRMDY.DataStorage.LiteDB.Helpers;
 using JetBrains.Annotations;
-using LiteDB;
 using LiteDB.Async;
 using Microsoft.Extensions.Logging;
 

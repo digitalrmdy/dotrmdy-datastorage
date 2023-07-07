@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using dotRMDY.Components.Shared.Extensions;
+using dotRMDY.Components.Extensions;
 using dotRMDY.DataStorage.LiteDB.Databases;
 using dotRMDY.DataStorage.LiteDB.Repositories.Implementations;
 using dotRMDY.DataStorage.LiteDB.UnitTests.TestHelpers;

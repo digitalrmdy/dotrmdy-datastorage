@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using dotRMDY.Components.Shared.Extensions;
+using dotRMDY.Components.Extensions;
 using dotRMDY.DataStorage.Abstractions.Models;
 using dotRMDY.DataStorage.LiteDB.Databases;
 using JetBrains.Annotations;

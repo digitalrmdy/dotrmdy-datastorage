@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using dotRMDY.Components.Shared.Helpers;
+using dotRMDY.Components.Helpers;
 using JetBrains.Annotations;
 using LiteDB.Async;
 

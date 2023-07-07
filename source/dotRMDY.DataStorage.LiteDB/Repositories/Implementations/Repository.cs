@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using dotRMDY.Components.Shared.Extensions;
+using dotRMDY.Components.Extensions;
 using dotRMDY.DataStorage.Abstractions.Models;
 using dotRMDY.DataStorage.Abstractions.Repositories;
 using dotRMDY.DataStorage.LiteDB.Databases;

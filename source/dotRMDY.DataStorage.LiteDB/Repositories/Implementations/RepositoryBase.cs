@@ -6,6 +6,7 @@ using dotRMDY.Components.Extensions;
 using dotRMDY.DataStorage.Abstractions.Models;
 using dotRMDY.DataStorage.LiteDB.Databases;
 using JetBrains.Annotations;
+using LiteDB;
 using LiteDB.Async;
 using Microsoft.Extensions.Logging;
 
@@ -20,9 +21,7 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 		private bool _isInitialized;
 
 		protected ILogger Logger { get; }
-
 		protected abstract IEnumerable<IBaseDb> DatabaseList { get; }
-
 		protected virtual string? CollectionName => null;
 
 		protected RepositoryBase(ILogger logger)
@@ -32,9 +31,31 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 			_initSemaphoreSlim = new SemaphoreSlim(1, 1);
 		}
 
-		public async Task Initialize()
+		protected virtual async Task<ILiteCollectionAsync<T>> GetCollection(IBaseDb db)
 		{
-			if (_isInitialized)
+			await Initialize().ConfigureAwait(false);
+
+			return await GetCollectionInternal(db).ConfigureAwait(false);
+		}
+
+		protected async Task EnsureIndexes(IBaseDb db)
+		{
+			var collection = await GetCollectionInternal(db);
+			await EnsureIndexes(collection);
+		}
+
+		protected virtual Task EnsureIndexes(ILiteCollectionAsync<T> collection)
+		{
+			return Task.CompletedTask;
+		}
+
+		protected virtual void ConfigureMapper(BsonMapper databaseMapper)
+		{
+		}
+
+		private async Task Initialize()
+		{
+			if (_isInitialized && DatabaseList.All(db => db.IsInitialized))
 			{
 				return;
 			}
@@ -43,15 +64,12 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 			{
 				await _initSemaphoreSlim.WaitAsync();
 
-				if (_isInitialized)
+				if (_isInitialized && DatabaseList.All(db => db.IsInitialized))
 				{
 					return;
 				}
 
-				Logger.LogDebug("Initializing {Type}", GetType().GetRealTypeName());
-				await Task.WhenAll(DatabaseList.Select(db => db.Initialize())).ConfigureAwait(false);
-
-				await EnsureIndexesInternal();
+				await Task.WhenAll(DatabaseList.Select(InitializeInternal)).ConfigureAwait(false);
 
 				_isInitialized = true;
 			}
@@ -61,29 +79,24 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 			}
 		}
 
-		protected virtual async Task<ILiteCollectionAsync<T>> GetCollection(IBaseDb db)
+		private async Task InitializeInternal(IBaseDb db)
 		{
-			var databaseInstance = await db.GetDatabaseInstance();
-			return databaseInstance.GetCollection<T>(CollectionName);
-		}
-
-		private async Task EnsureIndexesInternal()
-		{
-			foreach (var database in DatabaseList)
+			if (!db.IsInitialized)
 			{
-				await EnsureIndexes(database);
+				Logger.LogDebug("Initializing {DatabaseType} for {RepositoryType}",
+					db.GetType().GetRealTypeName(),
+					GetType().GetRealTypeName());
+				await db.Initialize().ConfigureAwait(false);
+
+				await EnsureIndexes(db).ConfigureAwait(false);
+				ConfigureMapper(db.Mapper ?? BsonMapper.Global);
 			}
 		}
 
-		protected async Task EnsureIndexes(IBaseDb db)
+		private async Task<ILiteCollectionAsync<T>> GetCollectionInternal(IBaseDb db)
 		{
-			var collection = await GetCollection(db);
-			await EnsureIndexes(collection);
-		}
-
-		protected virtual Task EnsureIndexes(ILiteCollectionAsync<T> collection)
-		{
-			return Task.CompletedTask;
+			var databaseInstance = await db.GetDatabaseInstance();
+			return databaseInstance.GetCollection<T>(CollectionName);
 		}
 	}
 }

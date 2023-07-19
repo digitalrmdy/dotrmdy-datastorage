@@ -40,6 +40,10 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 		/// </remark>
 		protected virtual string DbNameLog => Path.GetFileNameWithoutExtension(DbName) + "-log" + Path.GetExtension(DbName);
 
+		public virtual BsonMapper? Mapper => default;
+
+		public bool IsInitialized => _databaseInstance != null;
+
 		public Task Initialize()
 		{
 			return InitializeInternal();
@@ -47,7 +51,7 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 
 		public async Task<ILiteDatabaseAsync> GetDatabaseInstance()
 		{
-			if (_databaseInstance == null)
+			if (!IsInitialized)
 			{
 				await InitializeInternal();
 			}
@@ -120,14 +124,14 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 
 		protected virtual async Task InitializeInternal(bool isRetry = false)
 		{
-			if (_databaseInstance != null)
+			if (IsInitialized)
 			{
 				return;
 			}
 
 			await _dbInitSemaphoreSlim.WaitAsync();
 
-			if (_databaseInstance != null)
+			if (IsInitialized)
 			{
 				_dbInitSemaphoreSlim.Release();
 				return;
@@ -140,15 +144,11 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 
 			try
 			{
-				var connection = new ConnectionString
-				{
-					Filename = dbPath,
-					Password = await DatabaseKeyProvider.GetDbKey()
-				};
+				var connectionString = await CreateDatabaseConnectionString(dbPath);
 
-				_databaseInstance = new LiteDatabaseAsync(connection) { Timeout = LockTimeout };
+				_databaseInstance = new LiteDatabaseAsync(connectionString, Mapper) { Timeout = LockTimeout };
 
-				await _databaseInstance.CollectionExistsAsync("testdbkey");
+				await _databaseInstance!.CollectionExistsAsync("testdbkey");
 			}
 			catch (Exception exc)
 			{
@@ -170,6 +170,15 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 			}
 
 			_dbInitSemaphoreSlim.Release();
+		}
+
+		protected virtual async Task<ConnectionString> CreateDatabaseConnectionString(string dbPath)
+		{
+			return new ConnectionString
+			{
+				Filename = dbPath,
+				Password = await DatabaseKeyProvider.GetDbKey()
+			};
 		}
 
 		protected virtual async Task DbCheckPoint()

@@ -37,7 +37,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.GetAll();
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.FindAllAsync()).MustHaveHappenedOnceExactly();
 			result.Should().BeEquivalentTo(items);
 		}
@@ -53,8 +55,30 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.GetAll();
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.FindAllAsync()).MustHaveHappenedOnceExactly();
+			result.Should().BeEquivalentTo(items);
+		}
+
+		[Fact]
+		public async Task GetAll_AlreadyInitialized()
+		{
+			// Arrange
+			var items = new[] { A.Dummy<TestRepositoryEntity>() };
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindAllAsync()).Returns(items);
+
+			_ = await Sut.GetAll();
+
+			// Act
+			var result = await Sut.GetAll();
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindAllAsync()).MustHaveHappenedTwiceExactly();
 			result.Should().BeEquivalentTo(items);
 		}
 
@@ -70,7 +94,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.GetForId(id);
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.FindByIdAsync(id)).MustHaveHappenedOnceExactly();
 			result.Should().BeEquivalentTo(item);
 		}
@@ -86,9 +112,32 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.GetForId("id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.FindByIdAsync("id")).MustHaveHappenedOnceExactly();
 			result.Should().BeNull();
+		}
+
+		[Fact]
+		public async Task GetForId_AlreadyInitialized()
+		{
+			// Arrange
+			var id = A.Dummy<string>();
+			var item = A.Dummy<TestRepositoryEntity>();
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindByIdAsync(id)).Returns(item);
+
+			_ = await Sut.GetForId(id);
+
+			// Act
+			var result = await Sut.GetForId(id);
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindByIdAsync(id)).MustHaveHappenedTwiceExactly();
+			result.Should().BeEquivalentTo(item);
 		}
 
 		[Fact]
@@ -103,9 +152,10 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.FindItem(x => x.Id == "id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
-			A.CallTo(() => _underlyingLiteCollectionAsync.FindOneAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._))
-				.MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindOneAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._)).MustHaveHappenedOnceExactly();
 			result.Should().BeEquivalentTo(item);
 		}
 
@@ -120,10 +170,33 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.FindItem(x => x.Id == "id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo<Task<TestRepositoryEntity?>>(() => _underlyingLiteCollectionAsync.FindOneAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._)!)
 				.MustHaveHappenedOnceExactly();
 			result.Should().BeNull();
+		}
+
+		[Fact]
+		public async Task FindItem_AlreadyInitialized()
+		{
+			// Arrange
+			var item = A.Dummy<TestRepositoryEntity>();
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindOneAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._))
+				.Returns(item);
+
+			_ = await Sut.FindItem(x => x.Id == "id");
+
+			// Act
+			var result = await Sut.FindItem(x => x.Id == "id");
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindOneAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._)).MustHaveHappenedTwiceExactly();
+			result.Should().BeEquivalentTo(item);
 		}
 
 		[Fact]
@@ -138,7 +211,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.QueryItems(x => x.Id == "id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.FindAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._, An<int>._, An<int>._))
 				.MustHaveHappenedOnceExactly();
 			result.Should().BeEquivalentTo(items);
@@ -155,10 +230,34 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			var result = await Sut.QueryItems(x => x.Id == "id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.FindAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._, An<int>._, An<int>._))
 				.MustHaveHappenedOnceExactly();
 			result.Should().BeEmpty();
+		}
+
+		[Fact]
+		public async Task QueryItems_AlreadyInitialized()
+		{
+			// Arrange
+			var items = new[] { A.Dummy<TestRepositoryEntity>() };
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._, An<int>._, An<int>._))
+				.Returns(items);
+
+			_ = await Sut.QueryItems(x => x.Id == "id");
+
+			// Act
+			var result = await Sut.QueryItems(x => x.Id == "id");
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.FindAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._, An<int>._, An<int>._))
+				.MustHaveHappenedTwiceExactly();
+			result.Should().BeEquivalentTo(items);
 		}
 
 		[Fact]
@@ -171,12 +270,14 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.UpsertItem(item);
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.UpsertAsync(item)).MustHaveHappenedOnceExactly();
 		}
 
 		[Fact]
-		public async Task UpserItem_NullItem()
+		public async Task UpsertItem_NullItem()
 		{
 			// Arrange
 			TestRepositoryEntity? item = null;
@@ -185,12 +286,31 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.UpsertItem(item);
 
 			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustNotHaveHappened();
 			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustNotHaveHappened();
 			A.CallTo(() => _underlyingLiteCollectionAsync.UpsertAsync(item)).MustNotHaveHappened();
 		}
 
 		[Fact]
-		public async Task UpsertAllItems()
+		public async Task UpsertItem_AlreadyInitialized()
+		{
+			// Arrange
+			var item = new TestRepositoryEntity();
+
+			await Sut.UpsertItem(item);
+
+			// Act
+			await Sut.UpsertItem(item);
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.UpsertAsync(item)).MustHaveHappenedTwiceExactly();
+		}
+
+		[Fact]
+		public async Task UpsertAllItems_WithoutDropExistingRecords()
 		{
 			// Arrange
 			var items = new[] { A.Dummy<TestRepositoryEntity>() };
@@ -199,12 +319,32 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.UpsertAllItems(items);
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.UpsertAsync(items)).MustHaveHappenedOnceExactly();
 		}
 
 		[Fact]
-		public async Task UpsertAllItems_DropExistingRecords()
+		public async Task UpsertAllItems_WithoutDropExistingRecords_AlreadyInitialized()
+		{
+			// Arrange
+			var items = new[] { A.Dummy<TestRepositoryEntity>() };
+
+			await Sut.UpsertAllItems(items);
+
+			// Act
+			await Sut.UpsertAllItems(items);
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.UpsertAsync(items)).MustHaveHappenedTwiceExactly();
+		}
+
+		[Fact]
+		public async Task UpsertAllItems_WithDropExistingRecords()
 		{
 			// Arrange
 			var items = new[] { A.Dummy<TestRepositoryEntity>() };
@@ -213,9 +353,30 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.UpsertAllItems(items, true);
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.DeleteAllAsync()).MustHaveHappenedOnceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.InsertAsync(items)).MustHaveHappenedOnceExactly();
+		}
+
+		[Fact]
+		public async Task UpsertAllItems_WithDropExistingRecords_AlreadyInitialized()
+		{
+			// Arrange
+			var items = new[] { A.Dummy<TestRepositoryEntity>() };
+
+			await Sut.UpsertAllItems(items, true);
+
+			// Act
+			await Sut.UpsertAllItems(items, true);
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.DeleteAllAsync()).MustHaveHappenedTwiceExactly();
+			A.CallTo(() => _underlyingLiteCollectionAsync.InsertAsync(items)).MustHaveHappenedTwiceExactly();
 		}
 
 		[Fact]
@@ -228,6 +389,7 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.UpsertAllItems(items);
 
 			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustNotHaveHappened();
 			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustNotHaveHappened();
 			A.CallTo(() => _underlyingLiteCollectionAsync.UpsertAsync(items)).MustNotHaveHappened();
 		}
@@ -239,8 +401,26 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.DeleteItem("id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.DeleteAsync("id")).MustHaveHappenedOnceExactly();
+		}
+
+		[Fact]
+		public async Task DeleteItem_AlreadyInitialized()
+		{
+			// Arrange
+			await Sut.DeleteItem("id");
+
+			// Act
+			await Sut.DeleteItem("id");
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.DeleteAsync("id")).MustHaveHappenedTwiceExactly();
 		}
 
 		[Fact]
@@ -250,9 +430,28 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			await Sut.DeleteMany(x => x.Id == "id");
 
 			// Assert
-			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _underlyingLiteCollectionAsync.DeleteManyAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._)!)
 				.MustHaveHappenedOnceExactly();
+		}
+
+		[Fact]
+		public async Task DeleteMany_AlreadyInitialized()
+		{
+			// Arrange
+			await Sut.DeleteMany(x => x.Id == "id");
+
+			// Act
+			await Sut.DeleteMany(x => x.Id == "id");
+
+			// Assert
+			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 3 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappened(3, Times.Exactly);
+			A.CallTo(() => _underlyingLiteCollectionAsync.DeleteManyAsync(A<Expression<Func<TestRepositoryEntity, bool>>>._)!)
+				.MustHaveHappenedTwiceExactly();
 		}
 
 		[Fact]
@@ -263,29 +462,6 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 
 			// Assert
 			A.CallTo(() => _baseDb.DropCollection(A<string>._)).MustHaveHappenedOnceExactly();
-		}
-
-		[Fact]
-		public async Task Initialize()
-		{
-			// Act
-			await Sut.Initialize();
-
-			// Assert
-			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
-		}
-
-		[Fact]
-		public async Task Initialize_AlreadyInitialized()
-		{
-			// Arrange
-			await Sut.Initialize();
-
-			// Act
-			await Sut.Initialize();
-
-			// Assert
-			A.CallTo(() => _baseDb.Initialize()).MustHaveHappenedOnceExactly();
 		}
 	}
 

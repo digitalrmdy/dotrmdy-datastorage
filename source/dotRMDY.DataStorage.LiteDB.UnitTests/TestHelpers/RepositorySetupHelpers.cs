@@ -20,6 +20,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.TestHelpers
 			A.CallTo(() => baseDb.GetDatabaseInstance())
 				.Returns(underlyingDatabaseAsync);
 
+			A.CallTo(() => baseDb.Initialize())
+				.Invokes(() => A.CallTo(() => baseDb.IsInitialized).Returns(true));
+
 			return (baseDb, underlyingDatabaseAsync, underlyingLiteCollectionAsync);
 		}
 	}

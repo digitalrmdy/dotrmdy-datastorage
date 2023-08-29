@@ -660,13 +660,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			// 2 times due to initial access for setting up indexes when initializing repository
 			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._))
 				.MustHaveHappenedTwiceExactly()
-				.Then(A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.BeginTransactionAsync())
-					.MustHaveHappenedOnceExactly())
 				.Then(A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.DeleteAllAsync())
 					.MustHaveHappenedOnceExactly())
 				.Then(A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.InsertAsync(dummyEntities))
-					.MustHaveHappenedOnceExactly())
-				.Then(A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.CommitAsync())
 					.MustHaveHappenedOnceExactly());
 		}
 
@@ -686,13 +682,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			// 3 times due to initial access for setting up indexes when initializing repository
 			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._))
 				.MustHaveHappened(3, Times.Exactly);
-			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.BeginTransactionAsync())
-				.MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.DeleteAllAsync())
 				.MustHaveHappenedTwiceExactly();
 			A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.InsertAsync(dummyEntities))
-				.MustHaveHappenedTwiceExactly();
-			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.CommitAsync())
 				.MustHaveHappenedTwiceExactly();
 		}
 

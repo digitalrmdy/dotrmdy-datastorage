@@ -102,13 +102,8 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 
 			if (dropExistingRecords)
 			{
-				var liteDatabaseAsync = await InboxDb.GetDatabaseInstance();
-				await liteDatabaseAsync.BeginTransactionAsync();
-
 				await inboxCollection.DeleteAllAsync();
 				await inboxCollection.InsertAsync(models);
-
-				await liteDatabaseAsync.CommitAsync();
 			}
 			else
 			{

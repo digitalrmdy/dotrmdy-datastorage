@@ -24,7 +24,7 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 		protected readonly IBaseDb InboxDb;
 		protected readonly IBaseDb OutboxDb;
 
-		protected OutboxRepository(
+		public OutboxRepository(
 			ILogger logger,
 			IBaseDb inboxDb,
 			IBaseDb outboxDb)

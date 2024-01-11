@@ -21,7 +21,7 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 
 		protected IBaseDb InboxDb { get; }
 
-		protected Repository(
+		public Repository(
 			ILogger log,
 			IBaseDb inboxDb)
 			: base(log)

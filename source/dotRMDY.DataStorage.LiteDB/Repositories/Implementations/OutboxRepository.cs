@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 {
 	[PublicAPI]
-	public abstract class OutboxRepository<T> : RepositoryBase<T>, IOutboxRepository<T>
+	public class OutboxRepository<T> : RepositoryBase<T>, IOutboxRepository<T>
 		where T : class, IRepositoryBaseEntity
 	{
 		protected sealed override IEnumerable<IBaseDb> DatabaseList => new[] { InboxDb, OutboxDb };

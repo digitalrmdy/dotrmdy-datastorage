@@ -55,7 +55,7 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 
 		private async Task Initialize()
 		{
-			if (_isInitialized && DatabaseList.All(db => db.IsInitialized))
+			if (_isInitialized)
 			{
 				return;
 			}
@@ -64,7 +64,7 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 			{
 				await _initSemaphoreSlim.WaitAsync();
 
-				if (_isInitialized && DatabaseList.All(db => db.IsInitialized))
+				if (_isInitialized)
 				{
 					return;
 				}
@@ -83,10 +83,14 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 		{
 			if (!db.IsInitialized)
 			{
+				await db.Initialize().ConfigureAwait(false);
+			}
+
+			if (!_isInitialized)
+			{
 				Logger.LogDebug("Initializing {DatabaseType} for {RepositoryType}",
 					db.GetType().GetRealTypeName(),
 					GetType().GetRealTypeName());
-				await db.Initialize().ConfigureAwait(false);
 
 				await EnsureIndexes(db).ConfigureAwait(false);
 				ConfigureMapper(db.Mapper ?? BsonMapper.Global);

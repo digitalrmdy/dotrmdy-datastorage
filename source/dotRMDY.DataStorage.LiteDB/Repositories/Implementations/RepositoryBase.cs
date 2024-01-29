@@ -83,11 +83,12 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 		{
 			if (!db.IsInitialized)
 			{
-				Logger.LogDebug("Initializing {DatabaseType} for {RepositoryType}",
-					db.GetType().GetRealTypeName(),
-					GetType().GetRealTypeName());
 				await db.Initialize().ConfigureAwait(false);
+			}
 
+			if (!_isInitialized)
+			{
+				Logger.LogDebug("Initializing {RepositoryType}", GetType().GetRealTypeName());
 				await EnsureIndexes(db).ConfigureAwait(false);
 				ConfigureMapper(db.Mapper ?? BsonMapper.Global);
 			}

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using dotRMDY.Components.Extensions;
 using dotRMDY.DataStorage.LiteDB.Services;
 using JetBrains.Annotations;
 using LiteDB;
@@ -137,7 +138,7 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 				return;
 			}
 
-			Logger.LogDebug("Initializing " + nameof(BaseDb));
+			Logger.LogDebug("Initializing {DatabaseType} ", GetType().GetRealTypeName());
 
 			var dbPath = GetDatabasePath();
 			Logger.LogDebug("Database path: {DbPath}", dbPath);

@@ -14,7 +14,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="dotRMDY.Components" Version="1.2.0" />
-		<PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="All" />
+		<PackageReference Include="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="All" />
 		<PackageReference Include="LiteDB.Async" Version="0.1.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
 	</ItemGroup>

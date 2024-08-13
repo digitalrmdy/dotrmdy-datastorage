@@ -37,7 +37,9 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 		public async Task<int> Count()
 		{
 			var inboxCollection = await GetInboxCollection();
-			return await inboxCollection.CountAsync();
+			var outboxCollection = await GetOutboxCollection();
+
+			return await inboxCollection.CountAsync() + await outboxCollection.CountAsync();
 		}
 
 		public virtual async Task<IEnumerable<T>> GetAll()

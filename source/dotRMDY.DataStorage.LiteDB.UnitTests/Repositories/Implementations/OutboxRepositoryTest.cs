@@ -41,16 +41,21 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 			// Arrange
 			var items = new[] { A.Dummy<TestRepositoryEntity>() };
 			A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.CountAsync()).Returns(7);
+			A.CallTo(() => _outboxDbUnderlyingLiteCollectionAsync.CountAsync()).Returns(5);
 
 			// Act
 			var result = await Sut.Count();
 
 			// Assert
 			A.CallTo(() => _inboxDb.Initialize()).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _outboxDb.Initialize()).MustHaveHappenedOnceExactly();
 			// 2 times due to initial access for setting up indexes when initializing repository
 			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
-			A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.CountAsync()).MustHaveHappenedOnceExactly();
-			result.Should().Be(7);
+			A.CallTo(() => _outboxDbUnderlyingLiteCollectionAsync.CountAsync()).MustHaveHappenedOnceExactly();
+			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
+			A.CallTo(() => _outboxDbUnderlyingLiteCollectionAsync.CountAsync()).MustHaveHappenedOnceExactly();
+			
+			result.Should().Be(12);
 		}
 
 		[Fact]

@@ -11,6 +11,7 @@ namespace dotRMDY.DataStorage.Abstractions.Repositories
 	public interface IRepository<T>
 		where T : class, IRepositoryBaseEntity
 	{
+		Task<int> Count();
 		Task<IEnumerable<T>> GetAll();
 		Task<T?> GetForId(string id);
 		Task<T?> FindItem(Expression<Func<T, bool>> predicate);

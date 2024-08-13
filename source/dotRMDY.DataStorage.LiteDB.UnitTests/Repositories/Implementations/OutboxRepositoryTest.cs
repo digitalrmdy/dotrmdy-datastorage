@@ -36,6 +36,24 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 		}
 
 		[Fact]
+		public async Task Count()
+		{
+			// Arrange
+			var items = new[] { A.Dummy<TestRepositoryEntity>() };
+			A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.CountAsync()).Returns(7);
+
+			// Act
+			var result = await Sut.Count();
+
+			// Assert
+			A.CallTo(() => _inboxDb.Initialize()).MustHaveHappenedOnceExactly();
+			// 2 times due to initial access for setting up indexes when initializing repository
+			A.CallTo(() => _inboxDbUnderlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedTwiceExactly();
+			A.CallTo(() => _inboxDbUnderlyingLiteCollectionAsync.CountAsync()).MustHaveHappenedOnceExactly();
+			result.Should().Be(7);
+		}
+
+		[Fact]
 		public async Task GetAll()
 		{
 			// Arrange

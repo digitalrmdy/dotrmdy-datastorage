@@ -34,6 +34,12 @@ namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 			OutboxDb = outboxDb;
 		}
 
+		public async Task<int> Count()
+		{
+			var inboxCollection = await GetInboxCollection();
+			return await inboxCollection.CountAsync();
+		}
+
 		public virtual async Task<IEnumerable<T>> GetAll()
 		{
 			var inboxCollection = await GetInboxCollection();

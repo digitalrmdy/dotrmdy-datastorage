@@ -182,10 +182,11 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 			};
 		}
 
-		protected virtual async Task DbCheckPoint()
+		public virtual async Task DbCheckPoint()
 		{
 			if (_databaseInstance == null)
 			{
+				Logger.LogWarning("Db checkpoint called on uninitialized db");
 				return;
 			}
 

@@ -24,5 +24,6 @@ namespace dotRMDY.DataStorage.LiteDB.Databases
 
 		void ReinitializeCollections();
 		void ResetDatabase();
+		Task DbCheckPoint();
 	}
 }

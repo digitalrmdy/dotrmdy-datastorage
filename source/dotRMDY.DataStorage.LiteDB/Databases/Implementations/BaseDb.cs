@@ -12,25 +12,19 @@ using Microsoft.Extensions.Logging;
 namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 {
 	[PublicAPI]
-	public abstract class BaseDb : IBaseDb
+	public abstract class BaseDb(
+		ILogger<BaseDb> logger,
+		IDatabaseFolderPathProvider databaseFolderPathProvider,
+		IDatabaseKeyProvider databaseKeyProvider)
+		: IBaseDb
 	{
-		protected readonly ILogger<BaseDb> Logger;
-		protected readonly IDatabaseFolderPathProvider DatabaseFolderPathProvider;
-		protected readonly IDatabaseKeyProvider DatabaseKeyProvider;
+		protected readonly ILogger<BaseDb> Logger = logger;
+		protected readonly IDatabaseFolderPathProvider DatabaseFolderPathProvider = databaseFolderPathProvider;
+		protected readonly IDatabaseKeyProvider DatabaseKeyProvider = databaseKeyProvider;
 
 		private readonly SemaphoreSlim _dbInitSemaphoreSlim = new(1, 1);
 
 		private LiteDatabaseAsync? _databaseInstance;
-
-		protected BaseDb(
-			ILogger<BaseDb> logger,
-			IDatabaseFolderPathProvider databaseFolderPathProvider,
-			IDatabaseKeyProvider databaseKeyProvider)
-		{
-			Logger = logger;
-			DatabaseFolderPathProvider = databaseFolderPathProvider;
-			DatabaseKeyProvider = databaseKeyProvider;
-		}
 
 		protected virtual TimeSpan LockTimeout => TimeSpan.FromSeconds(90);
 
@@ -41,7 +35,7 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 		/// </remark>
 		protected virtual string DbNameLog => Path.GetFileNameWithoutExtension(DbName) + "-log" + Path.GetExtension(DbName);
 
-		public virtual BsonMapper? Mapper => default;
+		public virtual BsonMapper? Mapper => null;
 
 		public bool IsInitialized => _databaseInstance != null;
 
@@ -192,7 +186,7 @@ namespace dotRMDY.DataStorage.LiteDB.Databases.Implementations
 
 			try
 			{
-				Logger.LogInformation("Db checkpoint Hitmarker");
+				Logger.LogDebug("Db checkpoint Hitmarker");
 				await _databaseInstance.CheckpointAsync().ConfigureAwait(false);
 			}
 			catch (Exception e)

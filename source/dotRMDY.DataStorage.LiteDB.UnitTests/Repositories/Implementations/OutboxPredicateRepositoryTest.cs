@@ -16,7 +16,7 @@ using Xunit;
 
 namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 {
-	public class OutboxRepositoryTest : SutSupportingTest<TestOutboxRepository>
+	public class OutboxPredicateRepositoryTest : SutSupportingTest<TestOutboxPredicateRepository>
 	{
 		private IInboxDb _inboxDb = null!;
 		private ILiteDatabaseAsync _inboxDbUnderlyingLiteDatabaseAsync = null!;
@@ -874,9 +874,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 				.Then(A.CallTo(underlyingLiteDatabaseAsync.GetCollection<TestRepositoryEntity>(A<string>._)).MustHaveHappenedOnceExactly());
 	}
 
-	public sealed class TestOutboxRepository : OutboxRepository<TestRepositoryEntity>
+	public sealed class TestOutboxPredicateRepository : OutboxPredicateRepository<TestRepositoryEntity>
 	{
-		public TestOutboxRepository(ILogger log, IInboxDb inboxDb, IOutboxDb outboxDb) : base(log, inboxDb, outboxDb)
+		public TestOutboxPredicateRepository(ILogger log, IInboxDb inboxDb, IOutboxDb outboxDb) : base(log, inboxDb, outboxDb)
 		{
 		}
 	}

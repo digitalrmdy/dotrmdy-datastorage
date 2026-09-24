@@ -14,14 +14,14 @@ using Microsoft.Extensions.Logging;
 namespace dotRMDY.DataStorage.LiteDB.Repositories.Implementations
 {
 	[PublicAPI]
-	public class Repository<T> : RepositoryBase<T>, IRepository<T>
+	public class PredicateRepository<T> : RepositoryBase<T>, IPredicateRepository<T>
 		where T : class, IRepositoryBaseEntity
 	{
 		protected override IEnumerable<IBaseDb> DatabaseList => new[] { InboxDb };
 
 		protected IBaseDb InboxDb { get; }
 
-		public Repository(
+		public PredicateRepository(
 			ILogger log,
 			IBaseDb inboxDb)
 			: base(log)

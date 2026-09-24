@@ -13,7 +13,7 @@ using Xunit;
 
 namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 {
-	public class RepositoryTest : SutSupportingTest<TestRepository>
+	public class PredicateRepositoryTest : SutSupportingTest<TestPredicateRepository>
 	{
 		private IBaseDb _baseDb = null!;
 		private ILiteDatabaseAsync _underlyingLiteDatabaseAsync = null!;
@@ -483,9 +483,9 @@ namespace dotRMDY.DataStorage.LiteDB.UnitTests.Repositories.Implementations
 		}
 	}
 
-	public sealed class TestRepository : Repository<TestRepositoryEntity>
+	public sealed class TestPredicateRepository : PredicateRepository<TestRepositoryEntity>
 	{
-		public TestRepository(ILogger log, IBaseDb inboxDb) : base(log, inboxDb)
+		public TestPredicateRepository(ILogger log, IBaseDb inboxDb) : base(log, inboxDb)
 		{
 		}
 	}

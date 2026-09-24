@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 namespace dotRMDY.DataStorage.Abstractions.Repositories
 {
 	[PublicAPI]
-	public interface IOutboxRepository<T> : IRepository<T> where T : class, IRepositoryBaseEntity
+	public interface IOutboxPredicateRepository<T> : IPredicateRepository<T> where T : class, IRepositoryBaseEntity
 	{
 		Task UpdateItem(T model);
 

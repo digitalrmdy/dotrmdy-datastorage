@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using dotRMDY.DataStorage.Abstractions.Models;
 using JetBrains.Annotations;
@@ -6,7 +8,7 @@ using JetBrains.Annotations;
 namespace dotRMDY.DataStorage.Abstractions.Repositories;
 
 [PublicAPI]
-public interface IRepository<T>
+public interface IPredicateRepository<T> : IRepository<T>
 	where T : class, IRepositoryBaseEntity
 {
 	Task<int> Count();

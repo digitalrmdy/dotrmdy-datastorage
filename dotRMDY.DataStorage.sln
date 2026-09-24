@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotRMDY.DataStorage.LiteDB"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotRMDY.DataStorage.LiteDB.UnitTests", "source\dotRMDY.DataStorage.LiteDB.UnitTests\dotRMDY.DataStorage.LiteDB.UnitTests.csproj", "{AF5DFDCE-75F9-46EF-A7A1-F7A2FC943E68}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dotRMDY.DataStorage.Sqlite", "source\dotRMDY.DataStorage.Sqlite\dotRMDY.DataStorage.Sqlite.csproj", "{75293B1F-9452-46C0-A1C8-7F42D173B108}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,5 +30,9 @@ Global
 		{AF5DFDCE-75F9-46EF-A7A1-F7A2FC943E68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF5DFDCE-75F9-46EF-A7A1-F7A2FC943E68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF5DFDCE-75F9-46EF-A7A1-F7A2FC943E68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75293B1F-9452-46C0-A1C8-7F42D173B108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75293B1F-9452-46C0-A1C8-7F42D173B108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75293B1F-9452-46C0-A1C8-7F42D173B108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75293B1F-9452-46C0-A1C8-7F42D173B108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

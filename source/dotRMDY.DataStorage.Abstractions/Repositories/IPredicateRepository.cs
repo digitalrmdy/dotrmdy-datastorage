@@ -11,14 +11,7 @@ namespace dotRMDY.DataStorage.Abstractions.Repositories;
 public interface IPredicateRepository<T> : IRepository<T>
 	where T : class, IRepositoryBaseEntity
 {
-	Task<int> Count();
-	Task<IEnumerable<T>> GetAll();
-	Task<T?> GetForId(string id);
-
-	Task UpsertItem(T item);
-	Task UpsertAllItems(IEnumerable<T> model, bool dropExistingRecords = false);
-
-	Task DeleteItem(string id);
-
-	Task DropCollection();
+	Task<T?> FindItem(Expression<Func<T, bool>> predicate);
+	Task<List<T>> QueryItems(Expression<Func<T, bool>> predicate);
+	Task DeleteMany(Expression<Func<T, bool>> predicate);
 }

@@ -20,11 +20,16 @@ public static class StoredEntitySerializer
 
 	public static string Serialize(object data)
 	{
-		return JsonSerializer.Serialize(data, _serializerOptions);
+		return JsonSerializer.Serialize(data, data.GetType(), _serializerOptions);
 	}
 
 	public static T? Deserialize<T>(string data)
 	{
 		return JsonSerializer.Deserialize<T>(data, _serializerOptions);
+	}
+
+	public static object? Deserialize(string data, Type type)
+	{
+		return JsonSerializer.Deserialize(data, type, _serializerOptions);
 	}
 }

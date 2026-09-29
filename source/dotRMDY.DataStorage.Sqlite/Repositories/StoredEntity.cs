@@ -1,3 +1,4 @@
+using System;
 using dotRMDY.DataStorage.Abstractions.Models;
 using SQLite;
 
@@ -11,13 +12,16 @@ public abstract class StoredEntity<TDomain, TStored>
 	public string Id { get; init; } = null!;
 
 	public string Json { get; init; } = null!;
+	public string? PolymorphicTypeName { get; init; }
 
 	public static TStored FromDomain(TDomain domain)
 	{
+		var runtimeType = domain.GetType();
 		var stored = new TStored
 		{
 			Id = domain.Id,
-			Json = StoredEntitySerializer.Serialize(domain)
+			Json = StoredEntitySerializer.Serialize(domain),
+			PolymorphicTypeName = runtimeType == typeof(TDomain) ? null : GetTypeName(runtimeType)
 		};
 
 		stored.MapCustomFields(domain);
@@ -25,12 +29,30 @@ public abstract class StoredEntity<TDomain, TStored>
 		return stored;
 	}
 
+	public TDomain ToDomain()
+	{
+		if (PolymorphicTypeName == null)
+		{
+			return StoredEntitySerializer.Deserialize<TDomain>(Json)!;
+		}
+
+		var runtimeType = Type.GetType(PolymorphicTypeName, throwOnError: true)!;
+
+		if (!typeof(TDomain).IsAssignableFrom(runtimeType))
+		{
+			throw new InvalidOperationException(
+				$"Stored type '{runtimeType.FullName}' is not assignable to '{typeof(TDomain).FullName}'.");
+		}
+
+		return (TDomain)StoredEntitySerializer.Deserialize(Json, runtimeType)!;
+	}
+
 	protected virtual void MapCustomFields(TDomain domain)
 	{
 	}
 
-	public TDomain ToDomain()
+	private static string GetTypeName(Type type)
 	{
-		return StoredEntitySerializer.Deserialize<TDomain>(Json)!;
+		return $"{type.FullName}, {type.Assembly.GetName().Name}";
 	}
 }

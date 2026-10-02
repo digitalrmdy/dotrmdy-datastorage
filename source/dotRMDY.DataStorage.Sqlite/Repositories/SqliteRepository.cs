@@ -11,12 +11,20 @@ using SQLite;
 
 namespace dotRMDY.DataStorage.Sqlite.Repositories;
 
-public class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepository<TDomain>
+public abstract class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepository<TDomain>
 	where TDomain : class, IRepositoryBaseEntity
 	where TStored : StoredEntity<TDomain, TStored>, new()
 {
 	private readonly SemaphoreSlim _tableInitializationSemaphore = new(1, 1);
 	private bool _tableInitialized;
+
+	protected abstract bool SupportPolymorphism { get; }
+
+	protected string TableName => field ??= typeof(TStored)
+		.GetCustomAttributes(typeof(TableAttribute), true)
+		.Cast<TableAttribute>()
+		.Single()
+		.Name;
 
 	public async Task<int> Count()
 	{
@@ -32,7 +40,7 @@ public class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepositor
 		var storedItems = await GetAllStoredItems();
 
 		return storedItems
-			.Select(x => x.ToDomain())
+			.Select(x => x.ToDomain(SupportPolymorphism))
 			.ToList();
 	}
 
@@ -43,20 +51,23 @@ public class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepositor
 		var storedItem = await connection
 			.FindAsync<TStored>(id);
 
-		return storedItem?.ToDomain();
+		return storedItem?.ToDomain(SupportPolymorphism);
 	}
 
 	public async Task UpsertItem(TDomain domainItem)
 	{
 		var connection = await GetConnection();
 
-		await connection.InsertOrReplaceAsync(StoredEntity<TDomain, TStored>.FromDomain(domainItem));
+		await connection.InsertOrReplaceAsync(
+			StoredEntity<TDomain, TStored>.FromDomain(domainItem, SupportPolymorphism));
 	}
 
 	public virtual async Task UpsertAllItems(IEnumerable<TDomain> domainItems, bool dropExistingRecords = false)
 	{
 		var storedItems = domainItems
-			.Select(StoredEntity<TDomain, TStored>.FromDomain)
+			.Select(domainItem => StoredEntity<TDomain, TStored>.FromDomain(
+				domainItem,
+				SupportPolymorphism))
 			.ToList();
 
 		var connection = await GetConnection();
@@ -98,7 +109,7 @@ public class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepositor
 			.Where(predicate)
 			.FirstOrDefaultAsync();
 
-		return storedItem?.ToDomain();
+		return storedItem?.ToDomain(SupportPolymorphism);
 	}
 
 	protected async Task<IList<TDomain>> FindAllByPredicate(Expression<Func<TStored, bool>> predicate)
@@ -111,7 +122,7 @@ public class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepositor
 			.ToListAsync();
 
 		return storedItems
-			.Select(x => x.ToDomain())
+			.Select(x => x.ToDomain(SupportPolymorphism))
 			.ToList();
 	}
 
@@ -178,14 +189,5 @@ public class SqliteRepository<TDomain, TStored>(ISqliteDb database) : IRepositor
 		{
 			_tableInitializationSemaphore.Release();
 		}
-	}
-
-	protected static string GetTableName()
-	{
-		return typeof(TStored)
-			.GetCustomAttributes(typeof(TableAttribute), true)
-			.Cast<TableAttribute>()
-			.Single()
-			.Name;
 	}
 }
